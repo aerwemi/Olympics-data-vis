@@ -1,0 +1,177 @@
+<html>
+    <head>
+        <title>D3 Test</title>
+        <script type="text/javascript" src="d3.v2.min.js"></script>
+		<style type="text/css">
+			.axis path,
+			.axis line {
+				fill: none;
+				stroke: black;
+				shape-rendering: crispEdges;
+			}
+			
+			.axis text {
+				font-family: sans-serif;
+				font-size: 11px;
+			}
+		</style>
+    </head>
+    <body>
+        <script type="text/javascript">
+            d3.text("olympics.csv", function(unparsedData){
+				//parse the csv data
+				var parsedData = d3.csv.parse(unparsedData);
+				var dataset = [];
+				
+				//prepare the dataset for visualization
+				for(i = 0; i < parsedData.length; i++){
+					var percentage = (parseFloat(parsedData[i]["Female count"])+parseFloat(parsedData[i]["Male count"]))/parseInt(parsedData[i]["2010 population"]);
+					percentage*=1000000;
+					var medals = parseInt(parsedData[i]["Gold medals"])+parseInt(parsedData[i]["Silver medals"])+parseInt(parsedData[i]["Bronze medals"]);
+					dataset.push({country:parsedData[i]["Country name"], percentage:percentage, medals:medals});
+				}
+				/*
+				d3.select("body").selectAll("p")
+					.data(dataset)
+					.enter()
+					.append("p")
+					.text(function(d){
+						return d.country+" "+d.percentage+" "+d.medals;
+					});*/
+					
+				//define SVG object
+				var w = 800;
+				var h = 600;
+				var svg = d3.select("body")
+							.append("svg")
+							.attr("width", w)
+							.attr("height", h);
+					
+				//define scale
+				var padding = 30;
+				
+				var xScale = d3.scale.linear()
+									.domain([0, d3.max(dataset, function(d){return d.percentage})])
+									.range([padding, w - padding]);
+				var yScale = d3.scale.linear()
+									.domain([0, d3.max(dataset, function(d){return d.medals})])
+									.range([h - padding, padding]);
+									
+				//draw data points
+				svg.selectAll("circle")
+					.data(dataset)
+					.enter()
+					.append("circle")
+					.attr("cx", function(d){
+						return xScale(d.percentage);
+					})
+					.attr("cy", function(d){
+						return yScale(d.medals);
+					})
+					.attr("r", 7)
+					.attr("fill", function(d){
+						if(d.country == "US"){
+							return "rgba(31, 75, 255, 0.8)";
+						}
+						else if(d.country == "China"){
+							return "rgba(255, 31, 31, 0.8)";
+						}
+						else if(d.country == "Japan"){
+							return "rgba(255, 31, 218, 0.8)";
+						}
+						else if(d.country == "Germany"){
+							return "rgba(255, 221, 31, 0.8)";
+						}
+						else if(d.country == "France"){
+							return "rgba(144, 168, 249, 0.8)";
+						}
+						else if(d.country == "Brazil"){
+							return "rgba(11, 203, 40, 0.8)";
+						}
+						else if(d.country == "UK"){
+							return "rgba(40, 11, 203, 0.8)";
+						}
+						else if(d.country == "Italy"){
+							return "rgba(33, 139, 4, 0.8)";
+						}
+						else if(d.country == "Russia"){
+							return "rgba(251, 136, 136, 0.8)";
+						}
+						else if(d.country == "India"){
+							return "rgba(248, 116, 22, 0.8)";
+						}
+						else if(d.country == "Jamaica"){
+							return "rgba(0, 0, 0, 0.8)";
+						}
+						else if(d.country == "Georgia"){
+							return "rgba(89, 38, 52, 0.8)";
+						}
+						else if(d.country == "North Korea"){
+							return "rgba(110, 110, 110, 0.8)";
+						}
+						else if(d.country == "Armenia"){
+							return "rgba(221, 159, 3, 0.8)";
+						}
+						else if(d.country == "Mongolia"){
+							return "rgba(3, 207, 221, 0.8)";
+						}
+						else if(d.country == "Bahamas"){
+							return "rgba(180, 216, 254, 1)";
+						}
+						else if(d.country == "Moldova"){
+							return "rgba(183, 3, 186, 0.8)";
+						}
+						else if(d.country == "Tajikistan"){
+							return "rgba(156, 221, 3, 0.8)";
+						}
+						else if(d.country == "Montenegro"){
+							return "rgba(244, 77, 249, 0.8)";
+						}
+						else if(d.country == "Grenada"){
+							return "rgba(38, 89, 87, 0.8)";
+						}
+						
+					});
+					
+					//add text labels
+					svg.selectAll("text")
+						.data(dataset)
+						.enter()
+						.append("text")
+						.text(function(d){
+							return d.country;
+						})
+						.attr("x", function(d){
+							return xScale(d.percentage)-14;
+						})
+						.attr("y", function(d){
+							return yScale(d.medals)+16;
+						})
+						.attr("font-family", "sans-serif")
+						.attr("font-size", "11px")
+						.attr("fill", "rgba(100, 100, 100, 0.8)");
+						
+					//add axis
+					var xAxis = d3.svg.axis()
+								.scale(xScale)
+								.orient("bottom");
+					
+					svg.append("g")
+						.attr("class", "axis")
+						.attr("transform", "translate(0, " + (h - padding) + ")")
+						.call(xAxis);
+					
+					var yAxis = d3.svg.axis()
+						          .scale(yScale)
+						          .orient("left");
+						
+					svg.append("g")
+						.attr("class", "axis")
+						.attr("transform", "translate(" + padding + ",0)")
+						.call(yAxis);
+									
+				
+			});
+        </script>
+    </body>
+</html>
